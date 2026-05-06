@@ -1,13 +1,28 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
+import mongoose from 'mongoose';
+import authRoutes from './routes/auth.js';
 
 const app = express();
 dotenv.config();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/auth-app';
 
-// app.get('/',(req,res)=>{
-//     res.send("hello world!");
-// })
+// Middleware
+app.use(cors({
+  origin: 'http://localhost:5173', // Vite default port
+  credentials: true
+}));
+app.use(express.json());
+
+// MongoDB Connection
+mongoose.connect(MONGO_URI)
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.log('MongoDB connection error:', err));
+
+// Routes
+app.use('/api/auth', authRoutes);
 
 app.get('/github/data', (req, res) => {
     const data = 
@@ -47,8 +62,9 @@ app.get('/github/data', (req, res) => {
             "updated_at": "2026-04-28T17:21:06Z"
         }
     res.send(data);
-})
+});
 
-app.listen(PORT, (req, res) => {
-    console.log(`the server is listen on port ${PORT}`);
-})
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
