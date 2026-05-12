@@ -2,16 +2,20 @@ import mongoose from "mongoose";
 const todoSchema = new mongoose.Schema({
     title: {
         type: String,
-        require: true
+        required: true
     },
     description: {
         type: String,
-        require: true
+        required: true
     },
     author: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        require: true
+        required: true
+    },
+    subtodo: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "SubTodo"
     }
 },
 {

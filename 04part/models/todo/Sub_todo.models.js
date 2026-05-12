@@ -2,11 +2,11 @@ import mongoose from "mongoose";
 const subTodoSchema = new mongoose.Schema({
     title: {
         type: String,
-        require: true,
+        required: true,
     },
     description: {
         type: String,
-        requrie: true
+        requried: true
     },
     complete: {
         type: Boolean,
@@ -15,7 +15,7 @@ const subTodoSchema = new mongoose.Schema({
     parentTodo: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Todo",
-        require: true   
+        required: true   
     }
 },
 {
