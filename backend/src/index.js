@@ -1,14 +1,14 @@
 import connection from './db/index.js';
-
-import express from 'express';
-const app = express();
+import app from './app.js';
+import "dotenv/config";
 
 connection()
-.then(()=>{
-    app.listen(process.env.PORT,()=>{
-        console.log(`server is live on port ${process.env.PORT}`);
+    .then(() => {
+        app.listen(process.env.PORT, () => {
+            console.log(`Server is live on port ${process.env.PORT}`);
+        });
     })
-})
-.catch((err)=>{
-    console.log("mongodb connection failed",err);
-})
+    .catch((err) => {
+        console.error("MongoDB connection failed:", err);
+        process.exit(1);
+    });
