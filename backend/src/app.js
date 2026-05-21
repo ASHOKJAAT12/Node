@@ -1,24 +1,26 @@
 import express from 'express';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
+import cors from 'cros';
+import cookieparser from 'cookie-parser';
 
 const app = express();
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors());
-app.use(cookieParser());
+app.use(cors(
+    {
+        origin: 'http://localhost:3000',
+        credentials: true
+    }
+))
 
-// Routes
-app.get('/', (req, res) => {
-    res.json({ me: 'ashok choudhary' });
-});
+app.use(cookieparser());
+app.use(express.static("public"));
+app.use(express.json({
+    limit: "16kb"
+}));
+app.use(express.urlencoded({
+    extended: true,
+    limit: "16kb"
+}));
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Something went wrong' });
-});
 
-export default app;
+
+export { app };
