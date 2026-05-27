@@ -10,15 +10,24 @@ cloudinary.config({
 
 const uploadOnCloudinary = async (localfilepath) => {
     try {
-            if(!localfilepath) return null
+            if (!localfilepath) {
+                console.log("Cloudinary upload skipped: no local file path provided");
+                return null
+            }
             const response = await cloudinary.uploader.upload(localfilepath,{
                 resource_type: "auto"
             })
             //The file is uploade successfully on cloudinary
-            console.log(`file is uploaded. ${response.url}`);
+            
+            if (fs.existsSync(localfilepath)) {
+                fs.unlinkSync(localfilepath);
+            }
             return response;
     } catch ( error ) {
-            fs.unlinkSync(localfilepath)
+            console.error("Cloudinary upload failed:", error?.message || error);
+            if (localfilepath && fs.existsSync(localfilepath)) {
+                fs.unlinkSync(localfilepath)
+            }
             return null
     }
 }
