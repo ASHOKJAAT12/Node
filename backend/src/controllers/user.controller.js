@@ -38,14 +38,14 @@ const registerUser = asyncHandler(async (req, res)=> {
     }
 
     //check for avatar , check for coverImage
-    const avatarLocalPath = req.files?.avatar[0]?.path;
-    // const coverImageLocalPath = req.files.coverImage[0]?.path;
-    // console.log(req.files);
+    const avatarLocalPath = req.files?.avatar[0]?.path
+    // const coverImageLocalPath = req.files?.coverImage[0]?.path;
     
     let coverImageLocalPath;
     if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
         coverImageLocalPath = req.files.coverImage[0].path
     }
+    console.log(req.files);
 
     if (!avatarLocalPath) {
         throw new ApiError(400,"Avatar File Required!");
@@ -80,9 +80,49 @@ const registerUser = asyncHandler(async (req, res)=> {
         throw new ApiError(500,"Something went wrong while registering the user")
     }
     //return user creation response
+    console.log("user create successfully!");
+    
     return res.status(201).json(
         new ApiResponse(200,createdUser,"User Register Successfully")
     )
 })
 
-export { registerUser } ;
+
+const loginUser = asyncHandler( async (req, res) => {
+
+    //take username and password fron front end
+    //check username in database
+    //check password is correct
+    //if correct retru reponse
+
+    const { username, password } = req.body || {};
+
+    if ( !username || !password ) {
+        throw new ApiError(400,"All Feild Are Requried!");
+    }
+
+    const user = await User.findOne({username})
+
+    if (!user) {
+        throw new ApiError(404,"this username not found");
+    }
+
+    if (user) {
+        console.log(`username: ${username}`);
+        
+    }
+    const isPasswordVaild = await user.isPasswordCorrect(password);
+
+    if ( !isPasswordVaild ) {
+        throw new ApiError(401,"Wrong password");
+    }
+
+    const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
+
+    console.log("user successfully login.");
+    
+    return res.status(200).json(
+        new ApiResponse(200,loggedInUser,"user successfully login.")
+    )
+})
+export { registerUser, loginUser } ;
