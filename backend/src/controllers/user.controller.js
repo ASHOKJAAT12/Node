@@ -4,6 +4,19 @@ import { ApiResponse } from '../utils/ApiResponse.js'
 import { User } from '../models/user.models.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js'
 
+const generateAccessAndRefreshToken = async (userId) => {
+    try {
+        const user = await User.findOne(userId);
+        const accessToken = user.generateAccessToken();
+        const refreshToken = user.generateRefreshToken();
+
+        user.refreshToken = refreshToken;
+        user.save({ validateBeforeSave: false});
+        return { accessToken, refreshToken}
+    } catch (error) {
+        throw new ApiError(500,"something is wrong when generate access and refresh token.");
+    }
+}
 const registerUser = asyncHandler(async (req, res)=> {
     //take input from front end
     //validation not empty
@@ -117,12 +130,19 @@ const loginUser = asyncHandler( async (req, res) => {
         throw new ApiError(401,"Wrong password");
     }
 
+    const {accessToken,refreshToken} = generateAccessAndRefreshToken(user._id);
+
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
     console.log("user successfully login.");
-    
-    return res.status(200).json(
-        new ApiResponse(200,loggedInUser,"user successfully login.")
+    return res.status(200).cookie("accessToken",accessToken,options).cookie("refreshToken",refreshToken,options).json(
+        new ApiResponse(200,{
+            user: loggedInUser,refreshToken,accessToken
+        },"user successfully login.")
     )
 })
 export { registerUser, loginUser } ;
