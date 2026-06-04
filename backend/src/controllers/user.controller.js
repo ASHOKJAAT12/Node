@@ -3,6 +3,7 @@ import { ApiError } from '../utils/ApiError.js'
 import { ApiResponse } from '../utils/ApiResponse.js'
 import { User } from '../models/user.models.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js'
+import jwt from 'jsonwebtoken';
 
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -145,4 +146,8 @@ const loginUser = asyncHandler( async (req, res) => {
         },"user successfully login.")
     )
 })
+
+
+
+
 export { registerUser, loginUser } ;
