@@ -187,7 +187,7 @@ const accessRefreshToken = asyncHandler ( async (req, res) => {
     //generate access and refresh token
     //create options 
     //return res
-    
+
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
 
     if ( !incomingRefreshToken ) {
@@ -215,23 +215,23 @@ const accessRefreshToken = asyncHandler ( async (req, res) => {
 
         const { accessToken , newRefreshToken } = await generateAccessAndRefreshToken(user._id);
 
+        return res
+        .status(200)
+        .cookie("accessToken",accessToken,options)
+        .cookie("refreshToken",newRefreshToken,options)
+        .json(
+            new ApiResponse(200,
+                {
+                    accessToken,
+                    refreshToken: newRefreshToken
+                },
+                "Access Token Refresh."
+            )
+        )
     } catch (error) {
         throw new ApiError(401, error?.message || "access token can't refresh.");
     }
 
-    return res
-    .status(200)
-    .cookie("accessToken",accessToken,options)
-    .cookie("refreshToken",newRefreshToken,options)
-    .json(
-        new ApiResponse(200,
-            {
-                accessToken,
-                refreshToken: newRefreshToken
-            },
-            "Access Token Refresh."
-        )
-    )
 })
 
 export { registerUser, loginUser, logoutUser } ;
