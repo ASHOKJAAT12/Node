@@ -18,6 +18,7 @@ const generateAccessAndRefreshToken = async (userId) => {
         throw new ApiError(500,"something is wrong when generate access and refresh token.");
     }
 }
+
 const registerUser = asyncHandler(async (req, res)=> {
     //take input from front end
     //validation not empty
@@ -101,7 +102,6 @@ const registerUser = asyncHandler(async (req, res)=> {
     )
 })
 
-
 const loginUser = asyncHandler( async (req, res) => {
 
     //take username and password fron front end
@@ -178,5 +178,60 @@ const logoutUser = asyncHandler ( async (req, res ) => {
     )
 })
 
+const accessRefreshToken = asyncHandler ( async (req, res) => {
+    
+    //take input incoming refresh token 
+    //decode token
+    //find user
+    //compare token
+    //generate access and refresh token
+    //create options 
+    //return res
+    
+    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
+
+    if ( !incomingRefreshToken ) {
+        throw new ApiError(401,"unauthorized request");
+    }
+
+    try {
+
+        const decodedToken = jwt.verify( decodedToken , process.env.REFRESH_TOKEN_SECRET);
+
+        const user = await User.findById(decodedToken?._id)
+
+        if( !user ) {
+            throw new ApiError(401,"invalid token");
+        }
+
+        if ( incomingRefreshToken !== user?.refreshToken ) {
+            throw new ApiError(400,"refresh token is expire and used.")
+        }
+
+        const options = {
+            httpOnly: true,
+            secure: true
+        }
+
+        const { accessToken , newRefreshToken } = await generateAccessAndRefreshToken(user._id);
+
+    } catch (error) {
+        throw new ApiError(401, error?.message || "access token can't refresh.");
+    }
+
+    return res
+    .status(200)
+    .cookie("accessToken",accessToken,options)
+    .cookie("refreshToken",newRefreshToken,options)
+    .json(
+        new ApiResponse(200,
+            {
+                accessToken,
+                refreshToken: newRefreshToken
+            },
+            "Access Token Refresh."
+        )
+    )
+})
 
 export { registerUser, loginUser, logoutUser } ;
