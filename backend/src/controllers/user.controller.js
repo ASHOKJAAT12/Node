@@ -196,7 +196,7 @@ const accessRefreshToken = asyncHandler ( async (req, res) => {
 
     try {
 
-        const decodedToken = jwt.verify( decodedToken , process.env.REFRESH_TOKEN_SECRET);
+        const decodedToken = jwt.verify( incomingRefreshToken , process.env.REFRESH_TOKEN_SECRET);
 
         const user = await User.findById(decodedToken?._id)
 
@@ -249,7 +249,7 @@ const changeCurrentPassword = asyncHandler ( async ( req, res) => {
         throw new ApiError(400,"All feilds are required.");
     }
 
-    const user = await User.findById(req.body?._id)
+    const user = await User.findById(req.user?._id)
 
     if ( !user ) {
         throw new ApiError(401,"user can not find.");
@@ -260,9 +260,11 @@ const changeCurrentPassword = asyncHandler ( async ( req, res) => {
     if ( !isPassword ) {
         throw new ApiError(401,"invalid old password");
     }
-
     user.password = newPassword;
-    await user.save({ validateBeforeSave: false});
+    await user.save({
+    validateBeforeSave: false
+    });
+
 
     return res
     .status(200)
