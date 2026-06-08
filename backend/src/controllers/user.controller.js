@@ -284,7 +284,8 @@ const updateAccountDetails = asyncHandler ( async (req, res) => {
     //return res
 
     const { fullName, email } = req.body || {}
-
+    console.log(email);
+    
     if ( !fullName || !email ) {
         throw new ApiError(400,"All feild are required.");
     }
@@ -318,24 +319,19 @@ const updateUserAvatar = asyncHandler ( async (req, res) => {
     //return res
 
     const avatarLocalPath = req.file?.path
-
+    console.log(avatarLocalPath)
     if ( !avatarLocalPath ) { 
         throw new ApiError(400,"Avatar file is not uploade and missing");
     }
 
-    const user = await User.findById(req.body?._id);
-
-    const avatarUrl = user.avatar
-            .split("/")
-            .pop()
-            .split(".")[0];
+    const currentUser = await User.findById(req.user?._id);
+    console.log(currentUser);
+    const avatarUrl = currentUser.avatar.split("/").pop().split(".")[0];
         
     const deleteAvatar = await deleteFromCloudinary(avatarUrl);
+    console.log(avatarUrl);
 
-    if ( !deleteAvatar ) {
-        throw new ApiError(401,"Can not delete avatar image from cloudinary");
-    }
-    
+
     const avatar = await uploadOnCloudinary(avatarLocalPath);
 
     if ( !avatar || !avatar.url ) {
@@ -343,7 +339,7 @@ const updateUserAvatar = asyncHandler ( async (req, res) => {
     }
 
     const user = await User.findByIdAndUpdate(
-        req.body?._id,
+        req.user?._id,
         {
             $set: {
                 avatar: avatar.url
@@ -367,6 +363,8 @@ export {
     loginUser,
     logoutUser,
     accessRefreshToken,
-    changeCurrentPassword
+    changeCurrentPassword,
+    updateAccountDetails,
+    updateUserAvatar
 
 } ;
