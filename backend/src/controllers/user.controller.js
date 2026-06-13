@@ -392,6 +392,7 @@ const updateUserCoverImage = asyncHandler ( async (req, res) => {
         new ApiResponse(200,user,"cover Image update successfully")
     )
 })
+
 export {
 
     registerUser,
