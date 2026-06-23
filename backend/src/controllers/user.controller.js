@@ -2,8 +2,32 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js'
 import { ApiResponse } from '../utils/ApiResponse.js'
 import { User } from '../models/user.models.js';
+import { sendEmail } from '../utils/sendEmail.js';
 import { deleteFromCloudinary, uploadOnCloudinary } from '../utils/cloudinary.js'
 import jwt from 'jsonwebtoken';
+
+
+const otp = Math.floor(100000 + Math.random() * 900000);
+
+const otpSender = asyncHandler ( async (req, res) => {
+    const userEmail = req.body || {};
+
+    const sending = await sendEmail(
+        userEmail,
+        "Email Verification OTP",
+    `
+    <h2>Email Verification</h2>
+    <p>Your OTP is:</p>
+    <h1>${otp}</h1>
+    <p>This OTP is valid for 10 minutes.</p>
+    ` 
+    )
+    return res
+    .statusCode(200)
+    .json(
+        new ApiResponse(200,"OTP send successfull.")
+    )
+});
 
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -402,6 +426,6 @@ export {
     changeCurrentPassword,
     updateAccountDetails,
     updateUserAvatar,
-    updateUserCoverImage
-
+    updateUserCoverImage,
+    otpSender
 } ;
