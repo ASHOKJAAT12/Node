@@ -23,7 +23,7 @@ const otpSender = asyncHandler ( async (req, res) => {
     ` 
     )
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(200,"OTP send successfull.")
     )
