@@ -1,22 +1,48 @@
 import nodemailer from 'nodemailer';
-import { asyncHandler } from './asyncHandler.js';
+import Mailgen from 'mailgen';
+import { useActionState } from 'react';
 
-const sendEmail = asyncHandler ( async (to , subject, html) => {
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
+const sendMail = (options)=> {
+    const MailGenerator = new Mailgen(
+        theme: "default",
+        product: {
+            name
         }
-    });
+    )
+}
+const emailVerificationMailgenContent = (username , verificationUrl) => {
+    return {
+        body: {
+            name: username,
+            intro: "welcome to my app. thank you come here.",
+            action: {
+                instructions: "email verification link here!",
+                button: {
+                    color: "rgb(96, 240, 104)",
+                    text: "Email verification link.",
+                    link: verificationUrl
+                }
+            },
+            outro: "Need help contact our email"
+        }
+    }
+}
 
-    await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to,
-        subject,
-        html
-    })
-})
+const forgotPasswordMailgenContent = ( username , ResetPasswordUrl ) => {
+    return {
+        body: {
+            name: username,
+            intro: "Welcome to our app. tahnk you for visiting ",
+            action: {
+                instructions: "Reset password link here.",
+                button: {
+                    color: "rgb(96, 240, 104)",
+                    text: "Reset Pssword",
+                    link: ResetPasswordUrl
+                }
+            },
+            outro: "Need any help contact our email support."
+        }
+    }
+}
 
-
-export { sendEmail };
